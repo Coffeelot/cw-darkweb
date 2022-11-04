@@ -17,7 +17,7 @@ Anonymous Player 2 Player sales
 Items to add to qb-core>shared>items.lua 
 ```
 	-- CW darkweb
-	["sketchy_tablet"] =          {["name"] = "sketchy_tablet",         ["label"] = "An totally normal laptop",                  ["weight"] = 1, ["type"] = "item", ["image"] = "sketchy_tablet.png", ["unique"] = false, ["useable"] = true, ['shouldClose'] = false, ["combinable"] = nil, ["description"] = "This tablet certainly isn't used for anything illegal"},
+	["sketchy_tablet"] =          {["name"] = "sketchy_tablet",         ["label"] = "An totally normal tablet",                  ["weight"] = 1, ["type"] = "item", ["image"] = "sketchy_tablet.png", ["unique"] = false, ["useable"] = true, ['shouldClose'] = false, ["combinable"] = nil, ["description"] = "This tablet certainly isn't used for anything illegal"},
 
 ```
  
