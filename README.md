@@ -12,6 +12,8 @@ Planned:
 Anonymous chat rooms (think IRC)
 Anonymous Player 2 Player sales 
 
+# Showcase 📽
+[![YOUTUBE VIDEO](http://img.youtube.com/vi/prR0wx2UbSw/0.jpg)](https://youtu.be/prR0wx2UbSw)
 
 # Add to qb-core ❗
 Items to add to qb-core>shared>items.lua 
