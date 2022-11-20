@@ -12,6 +12,16 @@ Planned:
 Anonymous chat rooms (think IRC)
 Anonymous Player 2 Player sales 
 
+# Developed by Coffeelot and Wuggie
+[More scripts by us](https://github.com/stars/Coffeelot/lists/cw-scripts)  👈
+
+**Support, updates and script previews**:
+
+[![Join The discord!](https://cdn.discordapp.com/attachments/977876510620909579/1013102122985857064/discordJoin.png)](https://discord.gg/FJY4mtjaKr )
+
+**All our scripts are and will remain free**. If you want to support what we do, you can buy us a coffee here:
+
+[![Buy Us a Coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg)](https://www.buymeacoffee.com/cwscriptbois )
 
 # Add to qb-core ❗
 Items to add to qb-core>shared>items.lua 
@@ -22,4 +32,3 @@ Items to add to qb-core>shared>items.lua
 ```
  
 Also make sure the images are in qb-inventory>html>images
-## Developed by Coffeelot#1586 and Wuggie#1683

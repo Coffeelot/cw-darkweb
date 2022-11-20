@@ -63,7 +63,6 @@ local function generateAds()
         end
         return Ads
     else
-        print('generating new ads')
         Cooldown = true
         Ads = {}
         local amount = math.random(Config.Settings.TokensAmount.min, Config.Settings.TokensAmount.max)
