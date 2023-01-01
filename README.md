@@ -22,6 +22,8 @@ Anonymous Player 2 Player sales
 **All our scripts are and will remain free**. If you want to support what we do, you can buy us a coffee here:
 
 [![Buy Us a Coffee](https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg)](https://www.buymeacoffee.com/cwscriptbois )
+# Showcase 📽
+[![YOUTUBE VIDEO](http://img.youtube.com/vi/prR0wx2UbSw/0.jpg)](https://youtu.be/prR0wx2UbSw)
 
 # Add to qb-core ❗
 Items to add to qb-core>shared>items.lua 
