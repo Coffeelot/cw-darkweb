@@ -1,6 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject() 
 local Ads = {}
 local Cooldown = false
+local useDebug = Config.Debug
 
 -- for debug
 local function dump(o)
@@ -25,8 +26,26 @@ local function shallowCopy(original)
 	return copy
 end
 
+local function hasItem(item)
+    if Config.Inventory == 'qb' then
+        return QBCore.Functions.HasItem(item)
+    elseif Config.Inventory == 'ox' then
+        local fromItem = exports.ox_inventory:Search('count', item)
+        return fromItem > 0
+    end
+end
+
+local function hasCrypto(price)
+    if Config.Phone == 'qb' then
+        local Player = QBCore.Functions.GetPlayerData()
+        return Player.money['crypto'] >= price
+    elseif Config.Phone == 're' then
+        return exports['sundown-utils']:hasEnoughCrypto(Config.CryptoType, price)
+    end
+end
+
 local function setCWLaptopOpen(bool) 
-    if Config.Debug then
+    if useDebug then
        print('Laptop was opened')
     end
     SetNuiFocus(bool, bool)
@@ -58,11 +77,14 @@ end
 
 local function generateAds()
     if Cooldown then
-        if Config.Debug then
+        if useDebug then
            print('cooldown is active')
         end
         return Ads
     else
+        if useDebug then
+           print('generating new ads')
+        end
         Cooldown = true
         Ads = {}
         local amount = math.random(Config.Settings.TokensAmount.min, Config.Settings.TokensAmount.max)
@@ -71,13 +93,13 @@ local function generateAds()
         Citizen.SetTimeout(cooldownTime, function()
             Cooldown = false
         end)
-        if Config.Debug then
+        if useDebug then
            print('Amount of ads: ',amount)
            print('Cooldown lenght: ', cooldownTime)
         end
 
         for i = 1, amount, 1 do
-            if Config.Debug then
+            if useDebug then
                print('adding ad')
             end
             local randomNumber = math.random(1, #Config.TokenAds)
@@ -99,12 +121,12 @@ local function generateAds()
 end
 
 local function removeAd(adName)
-    if Config.Debug then
+    if useDebug then
        print('removing ad', adName)
     end
     for i, ad in ipairs (Ads) do 
         if (ad.name == adName) then
-            if Config.Debug then
+            if useDebug then
                print('found: ', ad.name)
             end
             table.remove(Ads, i)
@@ -115,13 +137,13 @@ end
 
 RegisterNUICallback('confirmPurchase', function(product, cb)
     local Player = QBCore.Functions.GetPlayerData()
-    if Player.money['crypto'] >= product.price then
-        if QBCore.Functions.HasItem('cw_token_empty') then
+    if hasCrypto(product.price) then
+        if hasItem('cw_token_empty') then
             if product.type == 'token' then
                 if Config.UseBuyTokens then
                     local productName = product.name
                     QBCore.Functions.TriggerCallback('cw-tokens:server:PlayerHasBuyToken', function(result)
-                        if Config.Debug then
+                        if useDebug then
                            print('result', dump(result))
                         end
                         if result then
@@ -183,4 +205,9 @@ end)
 
 RegisterCommand('closeDarkWeb', function(source)
     setCWLaptopOpen(false)
+end)
+
+RegisterNetEvent('cw-tokens:client:toggleDebug', function(debug)
+   print('Setting debug to',debug)
+   useDebug = debug
 end)
