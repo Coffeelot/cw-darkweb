@@ -2,7 +2,9 @@ Config = {}
 
 Config.Debug = false
 Config.UseBuyTokens = false
-
+Config.Inventory = 'ox' -- qb or ox
+Config.Phone = 're' -- qb for qb, re for renewed phone
+Config.CryptoType = 'moc' -- only relevant for renewed phone!
 Config.LaptopItem = 'sketchy_tablet'
 
 Config.Settings = {
