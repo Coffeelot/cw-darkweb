@@ -51,16 +51,16 @@ COMING SOON?!
 The ads are defined in the `Config.DarkwebAds` table in the config. This in an example with the options:
 ```lua
     {
-        title = "pizza slice", -- Title of the ad
-        description = 'This is a pizza slice', -- Description of the ad
+        title = "Sandwich AD", -- Title of the ad
+        description = 'One sandwich', -- Description of the ad
         items = { -- A table of items
             {  -- Item entry,
-                itemName = 'pep_pizza', -- item name (MAKE SURE THIS EXISTS IN YOUR ITEMS.LUA)
+                itemName = 'sandwich', -- item name (MAKE SURE THIS EXISTS IN YOUR ITEMS.LUA)
                 amount = 1, -- amount in batch
                 metadata = nil -- optional metadata/info table
             },  
         },
-        price = { min = 10, max = 20 }, -- price is defined with a min and a max, on list generation it's randomized between these numbers.
+        price = { min = 5, max = 200 }, -- price is defined with a min and a max, on list generation it's randomized between these numbers.
         required = { -- OPTIONAL: table that contains requirements
             item = 'vpn', -- item that's required to see this ad
         }
@@ -68,6 +68,30 @@ The ads are defined in the `Config.DarkwebAds` table in the config. This in an e
 ```
 
 > Note: if you do not meet requirement for the item it won't show up in the ad list at all. 
+
+# Create a dead drop from another script:
+You can use the included server export to create dead drops from other scripts, for example if you want to use these for payouts from jobs.
+
+```lua
+exports['cw-darkweb']:createCustomDropoff(<source>, <dropoff data>)
+```
+
+The source is the source of the player you want to give this to. The dropoff data is defined in the same way as you define Ads, so for example: 
+```lua
+    local dropoffData = {
+        title = "Sandwich Dropoff", -- Title of the ad
+        description = 'Thanks for killing that dude, heres your payment', -- Description of the ad
+        items = { -- A table of items
+            {  -- Item entry,
+                itemName = 'sandwich', -- item name (MAKE SURE THIS EXISTS IN YOUR ITEMS.LUA)
+                amount = 1, -- amount in batch
+                metadata = nil -- optional metadata/info table
+            },  
+        },
+    },
+    exports['cw-darkweb']:createCustomDropoff(source, dropoffData)
+```
+Will generate a custom dead drop containing a slice of 
 
 # How to use
 1) Get yourself a tablet
