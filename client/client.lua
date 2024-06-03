@@ -1,213 +1,346 @@
-local QBCore = exports['qb-core']:GetCoreObject() 
-local Ads = {}
-local Cooldown = false
+local QBCore = exports['qb-core']:GetCoreObject()
 local useDebug = Config.Debug
+local availableAds = {}
+local activeDropoffSpots = {}
+local attachedProp = nil
+local blips = {}
+local purchasedIds = {}
 
--- for debug
-local function dump(o)
-    if type(o) == 'table' then
-       local s = '{ '
-       for k,v in pairs(o) do
-          if type(k) ~= 'number' then k = '"'..k..'"' end
-          s = s .. '['..k..'] = ' .. dump(v) .. ','
-       end
-       return s .. '} '
+local function notify(text, type)
+    if Config.OxLibNotify then
+        lib.notify({
+            title = text,
+            type = type,
+        })
+    else 
+        QBCore.Functions.Notify(text, type)
+    end
+end
+
+local function getItemsInPockets()
+    if Config.Inventory == 'ox' then
+        return exports.ox_inventory:GetPlayerItems()
+    elseif Config.Invenotry == 'qb' then
+        return QBCore.Functions.GetPlayerData().items
     else
-       return tostring(o)
+        print('^1USING AN UNSUPPORTED INVENTORY SYSTEM^0')
     end
+
 end
 
--- functions
-local function shallowCopy(original)
-	local copy = {}
-	for key, value in pairs(original) do
-		copy[key] = value
-	end
-	return copy
-end
-
-local function hasItem(item)
-    if Config.Inventory == 'qb' then
-        return QBCore.Functions.HasItem(item)
-    elseif Config.Inventory == 'ox' then
-        local fromItem = exports.ox_inventory:Search('count', item)
-        return fromItem > 0
+local function getSizeOfTable(table)
+    local count = 0
+    if table then
+        for i, item in pairs(table) do
+            count = count + 1
+        end
     end
+    return count
 end
 
-local function hasCrypto(price)
-    if Config.Phone == 'qb' then
-        local Player = QBCore.Functions.GetPlayerData()
-        return Player.money['crypto'] >= price
-    elseif Config.Phone == 're' then
-        return exports['sundown-utils']:hasEnoughCrypto(Config.CryptoType, price)
-    end
-end
-
-local function setCWLaptopOpen(bool) 
+local function clearProp()
     if useDebug then
-       print('Laptop was opened')
+       print('REMOVING PROP', attachedProp)
     end
-    SetNuiFocus(bool, bool)
-    if bool then
-        TriggerEvent('animations:client:EmoteCommandStart', {"tablet2"})
-    else
-        TriggerEvent('animations:client:EmoteCommandStart', {"c"})
+    if DoesEntityExist(attachedProp) then
+        DeleteEntity(attachedProp)
+        attachedProp = 0
     end
-    SendNUIMessage({
-        action = "cwLaptop",
-        toggle = bool
-    })
 end
 
-local function openCWLaptop()
-    TriggerEvent('animations:client:EmoteCommandStart', {"tablet2"})
-    QBCore.Functions.Progressbar("open_cw_laptop", "Connecting to secure VPN", Config.Settings.VPNConnectionTime, false, true, {
-        disableMovement = false,
-        disableCarMovement = true,
-        disableMouse = false,
-        disableCombat = true,
-    }, {}, {}, {}, function()
-        setCWLaptopOpen(true)
-    end, function() -- Cancel
-        TriggerEvent('animations:client:EmoteCommandStart', {"c"})
-        QBCore.Functions.Notify("Canceled", "error")
+local function stopAnimation()
+    ClearPedTasks(PlayerPedId())
+    clearProp()
+end
+
+
+local function attachProp()
+    clearProp()
+    local model = 'prop_cs_tablet'
+    local boneNumber = 28422
+    SetCurrentPedWeapon(GetPlayerPed(-1), 0xA2719263)
+    local bone = GetPedBoneIndex(GetPlayerPed(-1), boneNumber)
+
+    RequestModel(model)
+    while not HasModelLoaded(model) do
+        Citizen.Wait(100)
+    end
+    attachedProp = CreateObject(model, 1.0, 1.0, 1.0, 1, 1, 0)
+    local x, y,z = 0.0, -0.03, 0.0
+    local xR, yR, zR = 20.0, -90.0, 0.0
+    AttachEntityToEntity(attachedProp, GetPlayerPed(-1), bone, x, y, z, xR, yR, zR, 0, true, false, true, 2, true)
+end
+
+local function handleAnimation()
+    local animDict = 'amb@code_human_in_bus_passenger_idles@female@tablet@idle_a'
+    if not DoesAnimDictExist(animDict) then
+        print('animation dict does not exist')
+        return false
+    end
+    RequestAnimDict(animDict)
+    while (not HasAnimDictLoaded(animDict)) do Wait(10) end
+    TaskPlayAnim(PlayerPedId(), animDict, "idle_a", 5.0, 5.0, -1, 51, 0, false, false, false)
+    attachProp()
+end
+
+local function getStuffAtLocation(coords)
+    if not activeDropoffSpots or getSizeOfTable(activeDropoffSpots) == 0 then if useDebug then print('^4No dropoffs available') end return nil end
+    for i, dropOffLocation in pairs(activeDropoffSpots) do
+        if dropOffLocation.coords == coords then
+            if useDebug then print('^2Spot had a dropoff!') end
+            notify('Found stuff', 'success')
+            return dropOffLocation
+        else
+            if useDebug then print('^1Spot did not have a dropoff!') end
+            return nil
+        end
+    end
+end
+
+local animDict = "anim@amb@business@weed@weed_inspecting_lo_med_hi@"
+local animName = "weed_crouch_checkingleaves_idle_04_inspector"
+local animNameHigh = "weed_stand_checkingleaves_idle_02_inspector"
+
+local function animDictIsLoaded()
+    if HasAnimDictLoaded(animDict) then if useDebug then print('^6Animation was already loaded') end return true end
+
+    RequestAnimDict(animDict)
+
+    local retrys = 0
+    while not HasAnimDictLoaded(animDict) do
+        if useDebug then print('Loading animation dict for gearbox', animDict) end
+        retrys = retrys + 1
+        if retrys > 10 then if useDebug then print('Breaking early') end return false end
+        Wait(0)
+    end
+    return true
+end
+
+local function cancelAnimation(high)
+    local animationName = animName
+    if high then animationName = animNameHigh end
+    StopAnimTask(PlayerPedId(), animDict, animationName, 1.0)
+    RemoveAnimDict(animDict)
+end
+
+local function applyAnimate(coords, high)
+    local animationName = animName
+    if high then animationName = animNameHigh end
+    TaskTurnPedToFaceCoord(PlayerPedId(), coords.x, coords.y, coords.z, 400)
+    Citizen.SetTimeout(400, function()
+        if animDictIsLoaded() then
+            if useDebug then print('^2Animation loaded successfully') end
+            TaskPlayAnim(PlayerPedId(), animDict, animationName, 8.0, 1.0, Config.ProgressbarTimeMS, 1, 0, 0, 0, 0)
+        else
+            if useDebug then print('^1Could not load animation') notify('Animation broke', 'error') end
+        end
     end)
 end
 
-local function generateAds()
-    if Cooldown then
-        if useDebug then
-           print('cooldown is active')
-        end
-        return Ads
+local function grabLoot(coords)
+    local dropoff = getStuffAtLocation(coords)
+    if dropoff then
+        TriggerServerEvent('cw-darkweb:server:doPickup', dropoff.id)
     else
-        if useDebug then
-           print('generating new ads')
-        end
-        Cooldown = true
-        Ads = {}
-        local amount = math.random(Config.Settings.TokensAmount.min, Config.Settings.TokensAmount.max)
-        local cooldownTime = math.random(Config.Settings.Cooldown.min, Config.Settings.Cooldown.max)
-
-        Citizen.SetTimeout(cooldownTime, function()
-            Cooldown = false
-        end)
-        if useDebug then
-           print('Amount of ads: ',amount)
-           print('Cooldown lenght: ', cooldownTime)
-        end
-
-        for i = 1, amount, 1 do
-            if useDebug then
-               print('adding ad')
-            end
-            local randomNumber = math.random(1, #Config.TokenAds)
-            local ad = shallowCopy(Config.TokenAds[randomNumber])
-            
-            ad.price = math.floor((math.random()*(ad.price.max-ad.price.min) + ad.price.min)*10)/10
-            if not ad.body then
-                if Config.UseBuyTokens then
-                    ad.body = Config.Settings.GenericTexts.BuyTokens
-                else
-                    ad.body = Config.Settings.GenericTexts.Tokens
-                end
-            end 
-    
-            table.insert(Ads, ad)
-        end
-        return Ads
+        notify('Nothing here', 'error')
     end
 end
 
-local function removeAd(adName)
-    if useDebug then
-       print('removing ad', adName)
-    end
-    for i, ad in ipairs (Ads) do 
-        if (ad.name == adName) then
-            if useDebug then
-               print('found: ', ad.name)
-            end
-            table.remove(Ads, i)
-            return;
-        end
-    end
-end
+local function attemptPickup(locationId)
+    local location = Config.DropoffLocations[locationId]
+    applyAnimate(location.coords, location.animateHigh)
 
-RegisterNUICallback('confirmPurchase', function(product, cb)
-    local Player = QBCore.Functions.GetPlayerData()
-    if hasCrypto(product.price) then
-        if hasItem('cw_token_empty') then
-            if product.type == 'token' then
-                if Config.UseBuyTokens then
-                    local productName = product.name
-                    QBCore.Functions.TriggerCallback('cw-tokens:server:PlayerHasBuyToken', function(result)
-                        if useDebug then
-                           print('result', dump(result))
-                        end
-                        if result then
-                            TriggerEvent('cw-tokens:client:attemtDigitalTradeFromToken', product.name, product.price)
-                            cb(true)
-                        else
-                            QBCore.Functions.Notify("You don't have the item needed", "error")       
-                            cb(false)
-                        end
-                    end, productName)
-                else
-                    TriggerEvent('cw-tokens:client:attemtDigitalTrade', product.name, product.price)
-                    cb(true)
-                end
-            else
-                print('type not implemented')
-            end
+    if Config.UseOxLibForProgressbar then
+        if lib.progressBar({
+            label = 'Searching...',
+            duration = Config.ProgressbarTimeMS,
+            useWhileDead = false,
+            canCancel = true,
+            disable = { car = true }
+        }) then
+            grabLoot(location.coords)
+            cancelAnimation(location.animateHigh)
         else
-            cb(false)
-            QBCore.Functions.Notify("You don't have the item needed", "error")       
+            cancelAnimation(location.animateHigh)
         end
     else
-        cb(false)
-        QBCore.Functions.Notify("You don't have enough crypto", "error")
+        QBCore.Functions.Progressbar("darkweb_loot", "Searching...", Config.ProgressbarTimeMS, false, true, {
+            disableMovement = true,
+            disableCarMovement = true,
+            disableMouse = false,
+            disableCombat = true,
+        }, {
+        }, {}, {}, function() -- Done
+            grabLoot(location.coords)
+            cancelAnimation(location.animateHigh)
+        end, function() -- Cancel
+            cancelAnimation(location.animateHigh)
+        end)
+    end
+end
+
+local function closeDarkwebTablet()
+    SetNuiFocus(false, false)
+    stopAnimation()
+    StopScreenEffect('MenuMGIn')
+    SendNUIMessage({
+        action = "cwDarkweb",
+        toggle = false,
+        type = 'toggleUi',
+    })
+end
+
+local function openDarkwebTablet()
+    TriggerServerEvent('cw-darkweb:server:getLatestList')
+    handleAnimation()
+    SetNuiFocus(true, true)
+    StartScreenEffect('MenuMGIn', 1, true)
+    SendNUIMessage({
+        action = "cwDarkweb",
+        toggle = true,
+        type = 'toggleUi',
+        inventory = getItemsInPockets()
+    })
+end
+
+RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
+    TriggerServerEvent('cw-darkweb:server:getLatestList')
+    SendNUIMessage({
+        action = "cwDarkweb",
+        type = 'baseData',
+        baseData = {
+            useLocalImages= Config.UseLocalImages,
+            oxInventory= Config.Inventory == 'ox',
+            currency= Config.CurrencyString
+        },
+    })
+end)
+
+RegisterNetEvent("cw-darkweb:client:openApp", function()
+    SendNUIMessage({
+        action = "cwDarkweb",
+        type = 'baseData',
+        baseData = {
+            useLocalImages= Config.UseLocalImages,
+            oxInventory= Config.Inventory == 'ox',
+            currency= Config.CurrencyString
+        },
+    })
+    openDarkwebTablet()
+end)
+
+local function myPickups()
+    local pickups = {}
+    for i, id in pairs(purchasedIds) do
+        for j, pickup in pairs(activeDropoffSpots) do
+            if id == j then
+                pickups[#pickups+1] = pickup
+            end
+        end
+    end
+    return pickups
+end
+
+RegisterNetEvent('cw-darkweb:client:updateGlobalList', function(ads, dropOffs)
+	availableAds = ads
+    activeDropoffSpots = dropOffs
+    if useDebug then 
+        print('new ads:', json.encode(ads, {indent=true}))
+        print('new pickups:', json.encode(dropOffs, {indent=true}))
+    end
+    SendNUIMessage({
+        action = "cwDarkweb",
+        type = 'updateList',
+        ads = ads,
+        pickups = myPickups()
+    })
+end)
+
+
+RegisterNetEvent('cw-darkweb:client:notifyPickup', function(dropoff)
+    for blipId, coords in pairs(blips) do
+        if dropoff.coords == coords then 
+            RemoveBlip(blipId)
+            blips[blipId] = nil
+        end
+    end
+    notify('Your items have been collected', 'success')
+
+end)
+
+RegisterNetEvent('cw-darkweb:client:notifyBuyer', function(coords, id)
+    purchasedIds[#purchasedIds+1] = id 
+    notify('Your pickup has been marked on your gps', 'success')
+    local blipId = AddBlipForCoord(coords.x, coords.y, coords.z)
+    SetBlipSprite(blipId, Config.Blip.sprite)
+    SetBlipColour(blipId, Config.Blip.color)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentSubstringPlayerName(Config.Blip.label)
+    EndTextCommandSetBlipName(blipId)
+    blips[blipId] = coords
+end)
+
+CreateThread(function()
+    for i, dropoff in ipairs(Config.DropoffLocations) do
+        local name = 'darkweb-dropoff-'..i
+        local options = {}
+        options[1] = {
+            type = 'client',
+            label = Config.DropoffTargetTitle,
+            icon = Config.DropoffTargetIcon,
+            action = function()
+                attemptPickup(i)
+            end,
+            onSelect = function()
+                attemptPickup(i)
+            end,
+        }
+        if Config.QbTarget then
+            exports['qb-target']:AddBoxZone(name, dropoff.coords,1.5, 1.5, {
+                name = name,
+                heading = 0,
+                debugPoly = useDebug,
+                minZ = dropoff.coords.z - 0.5,
+                maxZ = dropoff.coords.z + 0.5
+            }, {
+                options = options,
+                distance = 2.0
+            })
+        else
+            exports.ox_target:addSphereZone({
+                name = name,
+                coords = dropoff.coords,
+                radius = 1.5,
+                options = options
+            })
+        end
     end
 end)
 
-RegisterNUICallback('removeAd', function(data, cb)
-    removeAd(data)
+RegisterNUICallback('UiCloseUi', function(_, cb)
+    closeDarkwebTablet()
     cb(true)
 end)
 
-RegisterNUICallback('generateAds', function(data, cb)
-    generateAds()
-    cb(Ads)
+RegisterNUICallback('UiSetWaypoint', function(coords, cb)
+    if useDebug then print('setting wp to ', json.encode(coords, {indent=true})) end
+    SetNewWaypoint(coords.x, coords.y)
 end)
 
-RegisterNUICallback('exitCWLaptop', function(_, cb)
-    setCWLaptopOpen(false)
-    cb('ok')
-end)
-
-RegisterNetEvent("cw-darkweb:client:openInteraction", function()
-    openCWLaptop()
-end)
-
-RegisterNUICallback('checkIfPlayerHasCWLaptop', function(data, cb)
-    local retval = false
-    if QBCore.Functions.HasItem(Config.LaptopItem) then
-        cb(true)
-    else
+RegisterNUICallback('UiAttemptPurchase', function(adId, cb)
+    if not adId then
+        print('^1SETUP ERROR: No id')
         cb(false)
+        return
     end
-end)
-
-RegisterCommand('openDarkWeb', function(source)
-    openCWLaptop()
-end)
-
-RegisterCommand('closeDarkWeb', function(source)
-    setCWLaptopOpen(false)
-end)
-
-RegisterNetEvent('cw-tokens:client:toggleDebug', function(debug)
-   print('Setting debug to',debug)
-   useDebug = debug
+    if useDebug then print('Attempting to purchase ad with id', adId) end
+    if Config.OxForCallbacks then
+        local result = lib.callback.await('cw-darkweb:server:attemptPurchase', false, adId)
+        if useDebug then print('Purchase attempt result:', result) end
+        cb(result)
+    else
+        QBCore.Functions.TriggerCallback('cw-darkweb:server:attemptPurchase', function(result)
+            cb(result)
+        end, adId)
+    end
 end)

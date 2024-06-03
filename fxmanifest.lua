@@ -1,27 +1,30 @@
 fx_version 'cerulean'
-
 game 'gta5'
 
-ui_page 'html/index.html'
+author 'Coffeelot'
+description 'cw-darkweb II'
+version '1.0.0'
 
 shared_scripts {
-    '@qb-core/shared/locale.lua',
-    'locales/en.lua',
     'config.lua',
+    '@ox_lib/init.lua',
 }
 
-client_scripts{
-    'client/*.lua',
+client_script {
+    'client/client.lua',
 }
-
-server_scripts{
-    'server/*.lua',
+server_script {
+    '@oxmysql/lib/MySQL.lua',
+    'server/server.lua'
 }
 
 files {
-    'html/*',
+    "html/dist/index.html",
+    "html/dist/assets/*.*",
 }
 
-dependency{
-    'oxmysql',
+ui_page {
+    "html/dist/index.html"
 }
+
+lua54 'yes'

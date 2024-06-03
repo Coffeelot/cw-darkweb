@@ -1,154 +1,98 @@
 Config = {}
-
 Config.Debug = false
-Config.UseBuyTokens = false
-Config.Inventory = 'ox' -- qb or ox
-Config.Phone = 're' -- qb for qb, re for renewed phone
-Config.CryptoType = 'moc' -- only relevant for renewed phone!
-Config.LaptopItem = 'sketchy_tablet'
+Config.AmountOfAds = { min = 5, max = 10 } -- Min and max of how many ads will be generated every x minute
+Config.MinutesBetweenAdRefresh = 10 -- How many minutes until the list of ads refresh
+Config.Inventory = 'ox' -- Supported: ox and qb
+Config.QbTarget = false
+Config.OxForCallbacks = false
+Config.OxLibNotify = true
+Config.UseOxLibForProgressbar = true
+Config.ProgressbarTimeMS = 2000
 
-Config.Settings = {
-    TokensAmount = { min = 3, max = 4}, -- amount of Token ads that will show up
-    Cooldown = { min = 20000, max = 50000 }, -- time until ads will renew (in milliseconds)
-    VPNConnectionTime = 2000, -- time to open the tablet
-    GenericTexts = {
-        Tokens = 'Empty token needed to buy',
-        BuyTokens = 'You need to have the relevant buy token for this purchase'
-    }
+Config.Blip = {
+    label = Config.BlipLabel,
+    sprite = 468, -- https://docs.fivem.net/docs/game-references/blips/
+    color = 24 -- https://docs.fivem.net/docs/game-references/blips/
 }
 
-Config.TokenAds = {
-    {
-        name = 'raidmeth',
-        type = 'token',
-        title = 'Meth raid token',
-        price = {min = 1, max = 3},
-        footer = 'No refunds.'
+Config.MoneyType = 'cash' -- crypto, bank, cash
+Config.CurrencyString = '$' -- text that shows up in the app for currency
+
+Config.UseCustomChargeFunction = true -- if true then when charging a player crypto it will use the current function, modify for your own needs:
+Config.CustomCharge = function (src, price) 
+    if Config.Debug then print('^2calling custom cryto function') end
+    if exports['qb-phone']:hasEnough(src, 'cdc', math.floor(price)) then
+        exports['qb-phone']:RemoveCrypto(src, 'cdc', math.floor(price)) -- this example is for Renewed Phone, using crypto with id 'cdc'
+        return true -- If you modify this function make sure it returns true when successful and false when not
+    else
+        return false
+    end
+end
+
+Config.DarkwebAds = {
+    { -- basic example
+        title = "Beer bottle",
+        description = 'This a beer bottle',
+        items = {
+            { itemName = 'beer', amount = 1, metadata = nil },
+        },
+        price = { min = 1, max = 5 },
     },
-    {
-        name = 'boostsultanrs',
-        type = 'token',
-        title = 'Sultan RS boost token',
-        price = {min = 2, max = 3},
-        footer = 'No refunds.'
+    { -- example with several of one type of item
+        title = "Package of Coffee",
+        description = 'This is a box with several coffees in it',
+        items = {
+            { itemName = 'coffee', amount = 20, metadata = nil },
+        },
+        price = { min = 5, max = 20 }
     },
-    {
-        name = 'tradeUzi',
-        type = 'token',
-        title = 'UZI token',
-        price = {min = 0.7, max = 2},
-        footer = 'No refunds.'
+    { -- example with different items in it
+        title = "Package of Candy",
+        description = 'This is a box with different candy in it',
+        items = {
+            { itemName = 'twerks_candy', amount = 5, metadata = nil },
+            { itemName = 'snikkel_candy', amount = 5, metadata = nil },
+        },
+        price = { min = 5, max = 10 }
     },
-    {
-        name = 'raidcocaine',
-        type = 'token',
-        title = 'Cocaine Raid token',
-        price = {min = 3, max = 7},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'raidweed',
-        type = 'token',
-        title = 'Weed Raid token',
-        price = {min = 1, max = 3},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'boostvoodoo',
-        type = 'token',
-        title = 'Voodoo Boost token',
-        price = {min = 0.1, max = 0.5},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'raidart',
-        type = 'token',
-        title = 'Art raid token',
-        price = {min = 7, max = 8},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradePistol',
-        type = 'token',
-        title = 'Pistol token',
-        price = {min = 0.2, max = 0.9},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeSawedOff',
-        type = 'token',
-        title = 'Sawed Off token',
-        price = {min = 0.3, max = 1.2},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeMolotov',
-        type = 'token',
-        title = 'Molotov token',
-        price = {min = 0.5, max = 1.2},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeDoubleBarrel',
-        type = 'token',
-        title = 'Art raid token',
-        price = {min = 0.8, max = 1.1},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedNutrition',
-        type = 'token',
-        title = 'Weed nutrition token',
-        price = {min = 0.1, max = 0.4},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedWhiteWidow',
-        type = 'token',
-        title = 'White Widow seeds token',
-        price = {min = 0.9, max = 1.4},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedSkunk',
-        type = 'token',
-        title = 'Skunk seeds token',
-        price = {min = 0.9, max = 1.5},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedPurpleHaze',
-        type = 'token',
-        title = 'Purple Haze seeds token',
-        price = {min = 0.8, max = 1.7},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedOG',
-        type = 'token',
-        title = 'OG kush seeds token',
-        price = {min = 0.5, max = 1.9},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeWeedAmnesia',
-        type = 'token',
-        title = 'Amnesia seeds token',
-        price = {min = 0.7, max = 1.4},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeMeth',
-        type = 'token',
-        title = 'meth baggies token',
-        price = {min = 0.4, max = 1.0},
-        footer = 'No refunds.'
-    },
-    {
-        name = 'tradeCrack',
-        type = 'token',
-        title = 'crack baggies token',
-        price = {min = 0.4, max = 1.0},
-        footer = 'No refunds.'
-    },
+    { -- example with item requirement 
+        title = "AP pistol",
+        description = 'AP pistol, you know to shoot people with',
+        items = {
+            { itemName = 'weapon_appistol', amount = 1, metadata = nil },
+        },
+        price = { min = 7000, max = 11000 },
+        required = {
+            item = 'vpn',
+    }
+},
+}
+
+Config.DropoffTargetTitle = "Investigate"
+Config.DropoffTargetIcon = "fas fa-search"
+
+Config.DropoffLocations = {
+    { coords = vector3(1317.69, -1658.05, 50.24), description = "Behind the dumpster" },
+    { coords = vector3(1162.89, -1411.4, 33.95), description = "Behind the dumpster" },
+    { coords = vector3(996.39, -1483.75, 31.63), description = "In the AC unit", animateHigh = true },
+    { coords = vector3(958.21, -1492.51, 30.83), description = "Inside the concrete pipe" },
+    { coords = vector3(1001.61, -1536.55, 29.84), description = "By the boxes" },
+    { coords = vector3(920.25, -1891.38, 30.68), description = "By the boxes" },
+    { coords = vector3(889.37, -2174.67, 30.08), description = "By the boxes" },
+    { coords = vector3(834.02, -2305.2, 30.74), description = "Inside the dumpster" },
+    { coords = vector3(264.7, -3234.85, 5.16), description = "Inside the toilet in the portapotty. Bring gloves." },
+    { coords = vector3(-130.56, -2234.37, 6.81), description = "Behind the blue pallets" },
+    { coords = vector3(-1167.0, -2052.96, 13.78), description = "Inside the cardboard boxes next to the wreck" },
+    { coords = vector3(-1108.93, -1642.15, 4.11), description = "Inside the building. You can enter a door in the alleyway" },
+    { coords = vector3(-1473.63, -924.59, 9.9), description = "In a blue plastic pallet" },
+    { coords = vector3(-1762.62, -261.85, 47.31), description = "There's a grave that has not been filled yet. Package is in there." },
+    { coords = vector3(-3185.46, 1253.52, 5.6), description = "Wedged between some rocks under the bridge" },
+    { coords = vector3(-2080.46, 2612.77, 2.09), description = "Behind the barrel" },
+    { coords = vector3(497.64, 2967.41, 41.39), description = "Inside the portapotty" },
+    { coords = vector3(1580.9, 3581.93, 33.84), description = "In the trash pile that used to be a pool" },
+    { coords = vector3(2937.63, 4619.75, 48.17), description = "In the green box inside the train workshop building" },
+    { coords = vector3(1677.78, 6434.01, 30.77), description = "Tucked underneath the abandoned caravan" },
+    { coords = vector3(-215.5, 6269.41, 30.71), description = "In the trunk of the Peyote wreck" },
+    { coords = vector3(-444.58, 1597.66, 357.14), description = "In the rear, under the deck of the building" },
+    { coords = vector3(-155.44, -24.2, 59.02), description = "In the top left post box" },
 }
