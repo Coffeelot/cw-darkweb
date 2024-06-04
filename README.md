@@ -106,5 +106,20 @@ Will generate a custom dead drop containing a slice of
 ![List](https://cdn.discordapp.com/attachments/977876510620909579/1247244370374295633/image.png?ex=665f5256&is=665e00d6&hm=70817239e314893c39a2184f677f6855bdcd470cad3b79cb27a43e14d3c65616&)
 
 
+# Want to change the look?
+Darkweb is now built in VUE, this means you can't just edit the files directly. This requires some more know-how than just developing with basic html/js. You can find out more information in this [Boilerplate Repo](https://github.com/alenvalek/fivem-vuejs-boilerplate). **We do not offer support on this.**
+
+The very bacis for building and installing it are:
+1. Open a command window in the html folder
+2. run `npm i`
+3. run `npm run build` (to create a new build of the ui), `npm run watch` to dev with it
+
+> If nothing is happening, try deleting the dist folder before you run the build command
+
+> This does require some know-how and use of [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+> If you're catching errors, it might be because your Node version is old/to new. I use Node 18. 
+
+
 # Requirements: 
 QBCore (or QBox Core)
