@@ -20,7 +20,7 @@ end
 local function getItemsInPockets()
     if Config.Inventory == 'ox' then
         return exports.ox_inventory:GetPlayerItems()
-    elseif Config.Invenotry == 'qb' then
+    elseif Config.Inventory == 'qb' then
         return QBCore.Functions.GetPlayerData().items
     else
         print('^1USING AN UNSUPPORTED INVENTORY SYSTEM^0')
