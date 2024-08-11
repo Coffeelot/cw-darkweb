@@ -1,7 +1,14 @@
 <template>
     <Transition name="slide">
         <v-card v-if="ad" width="100%" variant="elevated" rounded="0" class="available-card" density="compact">
-            <v-card-title class="primary">{{ ad.title}} ({{ globalStore.$state.baseData.currency }}{{ ad.price }})</v-card-title>
+            <v-card-title class="card-title">
+                <span>
+                    {{ ad.title}} ({{ globalStore.$state.baseData.currency }}{{ ad.price }})
+                </span>
+                <v-chip variant="flat" v-if="ad.rep && ad.rep.name && ad.rep.required" :color="meetsRep ? 'primary' : 'error'">
+                    {{ translate('rep') }}: {{ playerRep }}/{{ ad.rep.required }} ({{ ad.rep.label? ad.rep.label : repLabel }})
+                </v-chip>
+            </v-card-title>
             <v-card-subtitle v-if="ad.description">
                 {{ ad.description }}
             </v-card-subtitle>
@@ -20,7 +27,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn size="large" rounded="0" color="primary" variant="tonal" @click='openModal()'>{{ translate('buy') }}</v-btn>
+                <v-btn size="large" :disabled="!meetsRep" rounded="0" color="primary" variant="tonal" @click='openModal()'>{{ translate('buy') }}</v-btn>
             </v-card-actions>
             <v-expand-transition>
                 <v-card
@@ -57,6 +64,7 @@ import { getImageLink } from "@/helpers/getImageLink";
 import { useGlobalStore } from "@/store/global";
 import { Ad } from "@/store/types";
 import { translate } from "@/translations/translate";
+import { computed } from "vue";
 import { ref } from "vue";
 
 const props = defineProps<{
@@ -67,6 +75,27 @@ const globalStore = useGlobalStore();
 const emits = defineEmits(['select'])
 const modalIsOpen = ref(false)
 const loadingPurchase = ref(false)
+
+const repLabel = computed(() => {
+    if (props.ad.rep && globalStore.baseData.playerRep) {
+        return globalStore.baseData.playerRep[props.ad.rep.name].label || globalStore.baseData.playerRep[props.ad.rep.name].name
+    }
+    return 'REPUTATION LABEL MISSING'
+})
+
+const playerRep = computed(() => {
+    if (props.ad.rep && globalStore.baseData.playerRep) {
+        return globalStore.baseData.useLevelsInsteadOfXp ? globalStore.baseData.playerRep[props.ad.rep.name].level :globalStore.baseData.playerRep[props.ad.rep.name].current
+    }
+    return 0
+})
+
+const meetsRep = computed(() => {
+    if (props.ad.rep && globalStore.baseData.playerRep) {
+        return playerRep.value > props.ad.rep.required
+    }
+    return true
+})
 
 const openModal = () => {
     modalIsOpen.value = true
@@ -112,5 +141,9 @@ const purchase = async () => {
     display: flex;
     gap: 0.5em;
     flex-wrap: wrap;
+}
+.card-title {
+    display: flex;
+    gap: 1em;
 }
 </style>

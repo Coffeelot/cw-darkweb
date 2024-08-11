@@ -217,13 +217,21 @@ RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
 end)
 
 RegisterNetEvent("cw-darkweb:client:openApp", function()
+
+    local skills = nil
+    if Config.UseCwRep then
+        skills = exports['cw-rep']:getAllSkillsAndLevel()
+    end
+
     SendNUIMessage({
         action = "cwDarkweb",
         type = 'baseData',
         baseData = {
             useLocalImages= Config.UseLocalImages,
             oxInventory= Config.Inventory == 'ox',
-            currency= Config.CurrencyString
+            currency= Config.CurrencyString,
+            playerRep = skills,
+            useLevelsInsteadOfXp = Config.UseLevelInsteadOfXP
         },
     })
     openDarkwebTablet()

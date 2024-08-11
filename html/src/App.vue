@@ -18,9 +18,6 @@ const globalStore = useGlobalStore();
 
 
 const toggleApp = (show: boolean): void => {
-  // if (show) {
-  //   getBaseData()
-  // }
   globalStore.$state.appIsOpen = show
 };
 

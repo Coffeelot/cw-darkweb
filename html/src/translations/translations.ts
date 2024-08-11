@@ -15,5 +15,6 @@ export const translations: {[key: string]: string} = {
     areaDescription: 'Area Description',
     coordinates: 'Coordinates',
     waypoint: 'Set waypoint',
-    purchaseError: 'The transaction could not be completed'
+    purchaseError: 'The transaction could not be completed',
+    rep: 'Rep requirement'
 }

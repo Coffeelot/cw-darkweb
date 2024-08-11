@@ -13,7 +13,9 @@ export const useGlobalStore = defineStore('global', {
     baseData: { 
       useLocalImages: false,
       oxInventory: false,
-      currency: '$'
+      currency: '$',
+      useLevelsInsteadOfXp: false,
+      playerRep: undefined
     } as BaseData,
     translations: [] as any,
     error: undefined as undefined | string

@@ -1,5 +1,5 @@
 Config = {}
-Config.Debug = false
+Config.Debug = true
 Config.AmountOfAds = { min = 5, max = 10 } -- Min and max of how many ads will be generated every x minute
 Config.MinutesBetweenAdRefresh = 10 -- How many minutes until the list of ads refresh
 Config.Inventory = 'ox' -- Supported: ox and qb
@@ -8,6 +8,9 @@ Config.OxForCallbacks = false
 Config.OxLibNotify = true
 Config.UseOxLibForProgressbar = true
 Config.ProgressbarTimeMS = 2000
+
+Config.UseCwRep = true -- Use CW-rep
+Config.UseLevelInsteadOfXP = true -- Use Levels instead of XP for CW Rep
 
 Config.Blip = {
     label = Config.BlipLabel,
@@ -37,6 +40,7 @@ Config.DarkwebAds = {
             { itemName = 'beer', amount = 1, metadata = nil },
         },
         price = { min = 1, max = 5 },
+        chance = 10 -- chance of being included in list, defaults to 100. 100 = 100% chance
     },
     { -- example with several of one type of item
         title = "Package of Coffee",
@@ -44,7 +48,12 @@ Config.DarkwebAds = {
         items = {
             { itemName = 'coffee', amount = 20, metadata = nil },
         },
-        price = { min = 5, max = 20 }
+        price = { min = 5, max = 20 },
+        rep = {
+            name = 'delivery', -- The name of the rep/skill you want to check (needs to match the name (not label) of what is in cw-rep)
+            required = 10, -- XP required, or level if Config.UseLevelInsteadOfXP = true
+            label= 'Coffee Drinkers' --overwrites the rep label/name in ui
+        },
     },
     { -- example with different items in it
         title = "Package of Candy",
@@ -64,8 +73,8 @@ Config.DarkwebAds = {
         price = { min = 7000, max = 11000 },
         required = {
             item = 'vpn',
-    }
-},
+        }
+    },
 }
 
 Config.DropoffTargetTitle = "Investigate"

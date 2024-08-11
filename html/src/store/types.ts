@@ -2,6 +2,8 @@ export interface BaseData {
     currency: string,
     useLocalImages: boolean,
     oxInventory: boolean,
+    useLevelsInsteadOfXp: boolean,
+    playerRep?: Record<string, PlayerRep>,
 }
 
 export interface AdItem {
@@ -16,6 +18,12 @@ export interface Requirement {
     metadata: Record<string, any>[]
 }
 
+export interface Rep {
+    name: string,
+    required: number,
+    label?: string
+}
+
 export interface Ad {
     price: number,
     expires: number,
@@ -23,7 +31,8 @@ export interface Ad {
     title: string,
     description: string,
     required?: Requirement,  
-    items: AdItem[]
+    items: AdItem[],
+    rep?: Rep
 }
 
 export interface Pickup {
@@ -58,3 +67,13 @@ export interface ItemType {
     label: string;
     count: number;
   }
+
+  export interface PlayerRep {
+    name: string
+    current: number
+    level: number
+    icon?: string
+    label?: string
+  }
+
+
