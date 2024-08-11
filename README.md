@@ -3,6 +3,11 @@
 Full rework of the darkweb tablet we had. Images of UI at bottom of this Readme. \
 Supports Ox Inv/lib and QBcore. You can select what features you want from whichever in the config.
 
+The randomized ads list work like this:
+1) A random number between what is defined in Config.AmountOfAds is created: X
+2) X ads are created by randomly picking from the list in Config.DarkwebAds
+3) If an ad has `chance` defined then we also check for this chance to be include, if not we skip this ad.
+
 > If you have feedback and suggestions then post about it in the Discord
 
 **Features:**
@@ -63,9 +68,17 @@ The ads are defined in the `Config.DarkwebAds` table in the config. This in an e
         price = { min = 5, max = 200 }, -- price is defined with a min and a max, on list generation it's randomized between these numbers.
         required = { -- OPTIONAL: table that contains requirements
             item = 'vpn', -- item that's required to see this ad
-        }
+        },
+        chance = 10 -- chance of being included in list, defaults to 100. 100 = 100% chance
+        rep = { -- this is optional, and only relevant if you want to gate items behind reputation/skills
+            name = 'delivery', -- The name of the rep/skill you want to check (needs to match the name (not label) of what is in cw-rep)
+            required = 10, -- XP required, or level if Config.UseLevelInsteadOfXP = true
+            label= 'Coffee Drinkers' --overwrites the rep label/name in ui
+        },
     },
 ```
+
+> Note: The `chance` doesn't affect the chance of the ad being selected, only that it's included if selected. The system is explained earlier in the readme.
 
 > Note: if you do not meet requirement for the item it won't show up in the ad list at all. 
 
