@@ -225,24 +225,34 @@ local function generateAdList()
             local adIndex = math.random(1, #possibleAds)
             local ad = possibleAds[adIndex]
             if ad then
-                ad.price = math.floor(math.random(ad.price.min, ad.price.max))
-                ad.expires = os.time() + Config.MinutesBetweenAdRefresh*60
-                ad.id = generateAdId()
-    
-                if ad.items then
-                    for i, item in pairs(ad.items) do
-                        local label = getLabelForItem(item.itemName) or 'YOU GOT ITEMS THAT ARE NOT DEFINED! CHECK SERVER LOGS'
-                        if label == 'YOU GOT ITEMS THAT ARE NOT DEFINED! CHECK SERVER LOGS' then
-                            print('^1==============================================')
-                            print('^1THIS ITEM DOES NOT EXIST IN YOUR ITEMS.LUA FILE:', item.itemName)
-                            print('^1==============================================')
+                if useDebug then print('(Potentially) Adding', ad.title) end
+
+                local chance = 100
+                if ad.chance then chance = ad.chance end
+                local rollToGet = math.random(0,100)
+
+                if chance > rollToGet then
+                    ad.price = math.floor(math.random(ad.price.min, ad.price.max))
+                    ad.expires = os.time() + Config.MinutesBetweenAdRefresh*60
+                    ad.id = generateAdId()
+        
+                    if ad.items then
+                        for i, item in pairs(ad.items) do
+                            local label = getLabelForItem(item.itemName) or 'YOU GOT ITEMS THAT ARE NOT DEFINED! CHECK SERVER LOGS'
+                            if label == 'YOU GOT ITEMS THAT ARE NOT DEFINED! CHECK SERVER LOGS' then
+                                print('^1==============================================')
+                                print('^1THIS ITEM DOES NOT EXIST IN YOUR ITEMS.LUA FILE:', item.itemName)
+                                print('^1==============================================')
+                            end
+                            ad.items[i].label = label
                         end
-                        ad.items[i].label = label
                     end
+        
+                    availableAds[#availableAds+1] = ad
+                    possibleAds[adIndex] = nil
+                else
+                    if useDebug then print('Roll did not meet requirements. Roll:', rollToGet, 'Chance:', chance ) end
                 end
-    
-                availableAds[#availableAds+1] = ad
-                possibleAds[adIndex] = nil
             end
         end    
     end
