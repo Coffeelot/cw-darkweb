@@ -251,6 +251,7 @@ local function generateAdList()
                     availableAds[#availableAds+1] = ad
                     possibleAds[adIndex] = nil
                 else
+                    possibleAds[adIndex] = nil
                     if useDebug then print('Roll did not meet requirements. Roll:', rollToGet, 'Chance:', chance ) end
                 end
             end
