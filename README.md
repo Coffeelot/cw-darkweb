@@ -8,19 +8,28 @@ The randomized ads list work like this:
 2) X ads are created by randomly picking from the list in Config.DarkwebAds
 3) If an ad has `chance` defined then we also check for this chance to be include, if not we skip this ad.
 
+The player auction work like this:
+1) Create an account
+2) Mark your waypoint (this will be the meeting spot sent to the buyer)
+3) Go to the Market tab and create an ad
+4) Wait for buyers to bid
+5) Accept the bid
+6) Meet up
+
 > If you have feedback and suggestions then post about it in the Discord
 
 **Features:**
 - Darkweb tablet
-- Customizeable ads (see Create an Ad section)
+- Customizeable generated ads (see Create an Ad section)
+- Player accounts
+- Player auctions
 - Randomly generated ads at set interavals
 - Randomly generated dead drops for pickup
 - Dead drop export for use with other scripts
 
 **Planned features:**
 - Metadata checks for items
-- Player to Player ads with dead drops for both sides
-- Player accounts (to have stores and validate sellers/buyers etc)
+- A short-term chat
 
 ### THE CONFIG IS SETUP FOR DEBUG/TESTING SO MAKE SURE TO GO OVER IT BEFORE USE!!!
 Also, not tested with QB inventory, but should support it
@@ -51,6 +60,8 @@ COMING SOON?!
 ```
 5) Start server and spawn the item `cw_darkweb_tablet`
 6) Add some way to get the tablets ingame, maybe as loot I dunno I'm not your mom.
+7) Make an account if you want to do player trades
+
 
 # Create an Ad
 The ads are defined in the `Config.DarkwebAds` table in the config. This in an example with the options:
