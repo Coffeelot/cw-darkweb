@@ -1,7 +1,7 @@
 <template>
   <div class="topbar">
     <div>
-      {{ translate('topBarText') }}
+      {{ translate('topBarText') }} <span v-if="globalStore.playerData.account"> [{{ translate('user') }}: {{ globalStore.playerData.account.name }}]</span>
     </div>
     <div class="inline">
       <v-icon icon="mdi-signal"></v-icon>

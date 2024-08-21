@@ -1,9 +1,33 @@
+
+export interface Account {
+    name: string,
+    rating: number,
+    citizenId: string,
+    sales: number,
+    purchases: number,
+    moneyHeld: number,
+    status: string
+}
+
+export interface PlayerData {
+    playerRep?: Record<string, PlayerRep>,
+    account?: Account,
+}
+
+export interface AuctionTime {
+    minutes: number
+    label: string
+}
 export interface BaseData {
     currency: string,
     useLocalImages: boolean,
     oxInventory: boolean,
     useLevelsInsteadOfXp: boolean,
-    playerRep?: Record<string, PlayerRep>,
+    noAccountBlocksPublicTrades: boolean,
+    accountCost: number,
+    auctionTimes: AuctionTime[],
+    playerCitizenId: string,
+    translations: Record<string,string>
 }
 
 export interface AdItem {
@@ -22,6 +46,34 @@ export interface Rep {
     name: string,
     required: number,
     label?: string
+}
+
+export interface AdAccount extends Account {
+    amount: number
+}
+
+export interface Bid {
+    name: string,
+    rating: number,
+    purchases: number
+    sales: number
+    citizenId: string
+    amount: number
+}
+export interface PlayerAd {
+    price: number,
+    expires: number,
+    auction: boolean
+    id: string,
+    title: string,
+    description: string,
+    seller: Account,
+    buyer?: AdAccount,
+    bids: Bid[],
+    endtime?: number,
+    status: 'AVAILABLE' | 'INTREST' | 'WAITING' |'ACCEPTED' | 'AWAITING_RATING' | 'DONE',
+    message: string
+    coords: [],
 }
 
 export interface Ad {

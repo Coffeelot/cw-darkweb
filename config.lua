@@ -3,14 +3,30 @@ Config.Debug = true
 Config.AmountOfAds = { min = 5, max = 10 } -- Min and max of how many ads will be generated every x minute
 Config.MinutesBetweenAdRefresh = 10 -- How many minutes until the list of ads refresh
 Config.Inventory = 'ox' -- Supported: ox and qb
-Config.QbTarget = false
 Config.OxForCallbacks = false
 Config.OxLibNotify = true
 Config.UseOxLibForProgressbar = true
 Config.ProgressbarTimeMS = 2000
 
-Config.UseCwRep = true -- Use CW-rep
-Config.UseLevelInsteadOfXP = true -- Use Levels instead of XP for CW Rep
+Config.UseCwRep = false -- Use CW-rep
+Config.UseLevelInsteadOfXP = false -- Use Levels instead of XP for CW Rep
+
+Config.NoAccountBlocksPublicTrades = false
+Config.AccountCreationCost = 10
+Config.AccountRemovalCost = 10
+Config.BanThreshold = -3
+
+Config.AdCreationCost = 10
+
+Config.Locale = TranslationEN -- MUST MATCH ONE OF THE LOCALES
+
+Config.AuctionTimes = {
+    { minutes = 1, label = '1 minute' },
+    { minutes = 5, label = '5 minutes' },
+    { minutes = 10, label = '10 minutes' },
+    { minutes = 20, label = '20 minutes' },
+    { minutes = 30, label = '30 minutes' }
+}
 
 Config.Blip = {
     label = Config.BlipLabel,
@@ -21,13 +37,15 @@ Config.Blip = {
 Config.MoneyType = 'cash' -- crypto, bank, cash
 Config.CurrencyString = '$' -- text that shows up in the app for currency
 
-Config.UseCustomChargeFunction = true -- if true then when charging a player crypto it will use the current function, modify for your own needs:
+Config.UseCustomChargeFunction = false -- if true then when charging a player crypto it will use the current function, modify for your own needs:
 Config.CustomCharge = function (src, price) 
     if Config.Debug then print('^2calling custom cryto function') end
     if exports['qb-phone']:hasEnough(src, 'cdc', math.floor(price)) then
+        if Config.Debug then print('^2Has Crypto') end
         exports['qb-phone']:RemoveCrypto(src, 'cdc', math.floor(price)) -- this example is for Renewed Phone, using crypto with id 'cdc'
         return true -- If you modify this function make sure it returns true when successful and false when not
     else
+        if Config.Debug then print('^1did not have money to pay') end
         return false
     end
 end

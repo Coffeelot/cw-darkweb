@@ -4,6 +4,10 @@ body {
   font-family: "VT323", monospace;
 }
 
+.page-content {
+  padding: 1em;
+}
+
 .inline {
   display: flex;
   flex-wrap: wrap;

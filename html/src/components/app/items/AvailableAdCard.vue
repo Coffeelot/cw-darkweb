@@ -9,7 +9,7 @@
                     {{ translate('rep') }}: {{ playerRep }}/{{ ad.rep.required }} ({{ ad.rep.label? ad.rep.label : repLabel }})
                 </v-chip>
             </v-card-title>
-            <v-card-subtitle v-if="ad.description">
+            <v-card-subtitle style="white-space: pre-line" v-if="ad.description">
                 {{ ad.description }}
             </v-card-subtitle>
             <v-card-text>
@@ -72,26 +72,25 @@ const props = defineProps<{
 }>()
 
 const globalStore = useGlobalStore();
-const emits = defineEmits(['select'])
 const modalIsOpen = ref(false)
 const loadingPurchase = ref(false)
 
 const repLabel = computed(() => {
-    if (props.ad.rep && globalStore.baseData.playerRep) {
-        return globalStore.baseData.playerRep[props.ad.rep.name].label || globalStore.baseData.playerRep[props.ad.rep.name].name
+    if (props.ad.rep && globalStore.playerData.playerRep) {
+        return globalStore.playerData.playerRep[props.ad.rep.name].label || globalStore.playerData.playerRep[props.ad.rep.name].name
     }
     return 'REPUTATION LABEL MISSING'
 })
 
 const playerRep = computed(() => {
-    if (props.ad.rep && globalStore.baseData.playerRep) {
-        return globalStore.baseData.useLevelsInsteadOfXp ? globalStore.baseData.playerRep[props.ad.rep.name].level :globalStore.baseData.playerRep[props.ad.rep.name].current
+    if (props.ad.rep && globalStore.playerData.playerRep) {
+        return globalStore.baseData.useLevelsInsteadOfXp ? globalStore.playerData.playerRep[props.ad.rep.name].level :globalStore.playerData.playerRep[props.ad.rep.name].current
     }
     return 0
 })
 
 const meetsRep = computed(() => {
-    if (props.ad.rep && globalStore.baseData.playerRep) {
+    if (props.ad.rep && globalStore.playerData.playerRep) {
         return playerRep.value > props.ad.rep.required
     }
     return true

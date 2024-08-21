@@ -27,9 +27,6 @@ const props = defineProps<{
   ad: BoughtAd
 }>()
 
-const globalStore = useGlobalStore();
-const emits = defineEmits(['select'])
-
 const setWaypoint = () => {
     api.post("UiSetWaypoint", JSON.stringify(props.ad.coords));
     closeApp()

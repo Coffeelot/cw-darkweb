@@ -7,28 +7,12 @@
       <TopBar></TopBar>
       <div class="app-container">
         <v-layout>
-          <div
-            class="tabs-container"
-            v-if="globalStore.$state.currentView.page === 'settings' || !hasProblem"
-          >
             <AvailableAdsPage
               v-if="globalStore.$state.currentView.page === 'ads'"
             ></AvailableAdsPage>
             <SettingsPage
               v-if="globalStore.$state.currentView.page === 'settings'"
             ></SettingsPage>
-          </div>
-          <div id="revoked-message-container" v-else>
-            <!-- <div class="revoked-message-holder">
-              <v-alert
-                :title="hasProblem.title"
-                :text="hasProblem.text"
-                :color="hasProblem.color ? hasProblem.color : 'error'"
-                :icon="hasProblem.icon ? hasProblem.icon : '$error'"
-              >
-              </v-alert>
-            </div> -->
-          </div>
         </v-layout>
         <v-alert closable class="alert" v-if="globalStore.$state.error" type="error" :text="translate(globalStore.$state.error)" />
       </div>
@@ -42,13 +26,10 @@ import { useGlobalStore } from "../store/global";
 import TopBar from "../components/app/TopBar.vue";
 import SettingsPage from "../components/app/pages/SettingsPage.vue";
 import { closeApp } from "@/helpers/closeApp";
-import { computed } from "vue";
 import AvailableAdsPage from "@/components/app/pages/AvailableAdsPage.vue";
 import { translate } from "@/translations/translate";
 
 const globalStore = useGlobalStore();
-
-const hasProblem = computed(() => false);
 
 document.onkeydown = function (evt) {
   if (evt?.key === "Escape") closeApp();

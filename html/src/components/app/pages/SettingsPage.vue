@@ -12,10 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import api from "@/api/axios";
-import { useGlobalStore } from "@/store/global";
-
-const globalStore = useGlobalStore();
 
 </script>
 

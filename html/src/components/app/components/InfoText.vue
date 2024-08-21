@@ -1,7 +1,7 @@
 <template>
   <div class="infotext">
-    <h3>{{ props.title }}</h3>
-    <h4 v-if="props.text">{{ props.text }}</h4>
+    <h1>{{ props.title }}</h1>
+    <h3 v-if="props.text">{{ props.text }}</h3>
   </div>
 </template>
 
@@ -17,6 +17,7 @@ const props = defineProps<{
 .infotext {
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }

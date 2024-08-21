@@ -6,6 +6,7 @@ description 'cw-darkweb II'
 version '1.0.0'
 
 shared_scripts {
+    'locales/*.lua',
     'config.lua',
     '@ox_lib/init.lua',
 }
@@ -15,7 +16,9 @@ client_script {
 }
 server_script {
     '@oxmysql/lib/MySQL.lua',
-    'server/server.lua'
+    'server/server.lua',
+    'server/accounts.lua',
+    'server/playerAds.lua',
 }
 
 files {

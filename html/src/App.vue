@@ -28,6 +28,7 @@ const handleUpdateData = (itemData: any) => {
 
 const handleMessageListener = (event: MessageEvent) => {
   const itemData: any = event?.data;
+
   if (itemData?.type) {
     switch (itemData.type) {
       case 'toggleUi':
@@ -40,6 +41,12 @@ const handleMessageListener = (event: MessageEvent) => {
       case 'baseData':
         globalStore.$state.baseData = itemData.baseData
         break;
+      case 'playerData':
+        globalStore.$state.playerData = itemData.playerData
+        break;
+      case 'updatePlayerList':
+        globalStore.$state.availablePlayerAds = itemData.availablePlayerAds
+        break;
       default:
         console.log('UNKNOWN TYPE FOR DARKWEB', itemData.type)
         break;
@@ -51,85 +58,7 @@ const handleMessageListener = (event: MessageEvent) => {
 
 onMounted(() => {
   window.addEventListener("message", handleMessageListener);
-  globalStore.$state.availableAds = [
-    {
-        title: "pizza slice",
-        items: [
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-        ],
-        price: 20,
-        expires: 202020,
-        description:'This is a pizza',
-        id: '20',
-    },
-    {
-        title: "10 pizza slices",
-        items: [
-            { itemName : 'pep_pizza', amount : 10, metadata : undefined },
-        ],
-        price: 20,
-        expires: 202020,
-        description:'This is 10 pizza slices',
-        id: '21',
-    },
-    {
-        title: "10 pizza slices but separate",
-        items: [
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-        ],
-        price: 20,
-        expires: 202020,
-        description:'This is a pizza',
-        id: '22',
-    },
-    {
-        title: "10 pizza slices but separate",
-        items: [
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-        ],
-        price: 20,
-        expires: 202020,
-        description:'This is a pizza',
-        id: '23',
-    },
-    {
-        title: "10 pizza slices but separate",
-        items: [
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-            { itemName : 'pep_pizza', amount : 1, metadata : undefined },
-        ],
-        price: 20,
-        expires: 202020,
-        description:'This is a pizza',
-        id: '24',
-    },
-  ]
+
 });
 
 onUnmounted(() => {
