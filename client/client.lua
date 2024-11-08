@@ -59,6 +59,7 @@ local function setupPrintout()
         print('Using OX Lib for notify', Config.OxLibNotify)
         print('Using OX Lib Callbacks', Config.OxForCallbacks)
         print('Inventory:', Config.Inventory)
+        print('Using QB target:', Config.QbTarget)
     
         print('^2= Rep = ')
         print('Using CW Rep', Config.UseCwRep)

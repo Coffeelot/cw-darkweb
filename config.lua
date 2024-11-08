@@ -3,6 +3,7 @@ Config.Debug = true
 Config.AmountOfAds = { min = 5, max = 10 } -- Min and max of how many ads will be generated every x minute
 Config.MinutesBetweenAdRefresh = 10 -- How many minutes until the list of ads refresh
 Config.Inventory = 'ox' -- Supported: ox and qb
+Config.QbTarget = false -- set to true if you use qbtarget 
 Config.OxForCallbacks = false
 Config.OxLibNotify = true
 Config.UseOxLibForProgressbar = true
@@ -18,7 +19,7 @@ Config.BanThreshold = -3
 
 Config.AdCreationCost = 10
 
-Config.Locale = TranslationEN -- MUST MATCH ONE OF THE LOCALES
+Config.Locale = TranslationEN -- Make sure variable in locales/x.lua is named correctly
 
 Config.AuctionTimes = {
     { minutes = 1, label = '1 minute' },
